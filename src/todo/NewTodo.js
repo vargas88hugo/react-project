@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { connect } from 'react-redux'
+import { createTodo } from './actions';
 
-function NewTodo() {
+function NewTodo({ todos = [], onCreatePressed }) {
   const [inputValue, setInputValue] = useState('');
   
   return (
@@ -11,9 +13,27 @@ function NewTodo() {
         placeholder="Type your new Todo"
         onChange={e => setInputValue(e.target.value)} 
       />
-      <button>Create Todo</button>
+      <button
+        onClick={() => {
+          const isDuplicatedText = todos.some(todo => todo.text === inputValue);
+          if (!isDuplicatedText) {
+            onCreatePressed(inputValue);
+            setInputValue('')
+          }
+        }}
+      >
+        Create Todo
+      </button>
     </div>
   )
 }
 
-export default NewTodo;
+const mapStateToProps = (state) => ({
+  todos: state.todos
+})
+
+const mapDispatchToProps = (dispatch) => ({
+  onCreatePressed: text => dispatch(createTodo(text))
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(NewTodo);
